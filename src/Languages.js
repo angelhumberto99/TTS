@@ -1,47 +1,48 @@
 export default class TextSpeech {
-    constructor() {
+    constructor(voices) {
         this.msg = "";
         this.pitch = 1;
         this.rate = 1;
-        this.voices = [];
-        this.getVoices();
-        if (window.speechSynthesis.onvoiceschange !== undefined)
-            window.speechSynthesis.onvoiceschange = this.getVoices;
-    }
-    
-    // obtiene las voces disponibles
-    getVoices = () => {
-        this.voices = window.speechSynthesis.getVoices();
-        this.currentVoice = this.voices[0];
+        this.voices = voices;
     }
 
+    // inicializa los parametros antes de hablar
+    Init = (msg, pitch, rate, lang) => {
+        this.msg = msg;
+        this.pitch = pitch;
+        this.rate = rate;
+        this.SetLaguage(lang);
+    }
+    
+
     // reproduce el texto
-    speak = () => {
-        if(window.speechSynthesis.speaking){
-            console.error("Already speaking...");
-            return;
-        }
-        if(this.msg !== ""){
+    Speak = () => {
+        if (window.speechSynthesis.speaking) return;
+        if (this.msg !== "") {
             const speakText = new SpeechSynthesisUtterance(this.msg);
-            speakText.onend = e => {
-                console.log("Done speaking");
-            }
-            speakText.onerror = e => {
-                console.error("Something went wrong");
-            }
             speakText.voice = this.currentVoice;
             speakText.rate = this.rate;
             speakText.pitch = this.pitch;
-            window.speechSynthesis.speak(speakText);    
+            window.speechSynthesis.speak(speakText);
         }
-    }
+    };
 
     // settea los valores para la voz requerida
-    setLaguage = (lang) => {
-        this.voices.map((e) => {
-            if (e.name === lang)
-                this.currentVoice = e;
-        });
-    }
-
+    SetLaguage = (lang) => {
+        for(let e of this.voices)
+            if (e.name === lang) this.currentVoice = e;
+    };
 }
+
+export function GetVoices() {
+    return new Promise(resolve => {
+        let id;
+        id = setInterval(() => {
+            let voices = window.speechSynthesis.getVoices()
+            if (voices.length > 0) {
+                resolve(voices)
+                clearInterval(id)
+            }
+        }, 1);
+    })
+};

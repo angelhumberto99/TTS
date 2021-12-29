@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
-import TextReader from '../components/TextReader';
+import React, { Component } from "react";
+import TextReader from "../components/TextReader";
 
 class IndexPage extends Component {
     render() {
-        return(
+        return (
             <div>
-                <TextReader/>
+                <TextReader />
             </div>
         );
     }
